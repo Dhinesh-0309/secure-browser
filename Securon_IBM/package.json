@@ -1,0 +1,27 @@
+{
+  "name": "securon-platform",
+  "version": "1.0.0",
+  "description": "Comprehensive cloud security analysis and governance platform",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=@securon/backend",
+    "dev:frontend": "npm run dev --workspace=@securon/frontend",
+    "dev:cli": "npm run dev --workspace=@securon/cli",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "npm run clean --workspaces && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

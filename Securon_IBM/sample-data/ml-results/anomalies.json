@@ -1,0 +1,94 @@
+[
+  {
+    "id": "anomaly-001",
+    "type": "suspicious_ip",
+    "confidence": 0.92,
+    "explanation": "IP address 192.0.2.146 shows unusual access patterns with high-frequency API calls outside normal business hours",
+    "affectedResources": [
+      "/api/v1/admin/users",
+      "/api/v1/data/download",
+      "/api/v1/users/export"
+    ],
+    "detectedAt": "2023-12-13T10:35:30.345Z",
+    "severity": "high",
+    "metadata": {
+      "sourceIp": "192.0.2.146",
+      "requestCount": 150,
+      "timeWindow": "15 minutes",
+      "normalBaseline": 5,
+      "deviationScore": 8.5
+    }
+  },
+  {
+    "id": "anomaly-002",
+    "type": "unusual_port",
+    "confidence": 0.78,
+    "explanation": "Unexpected traffic on port 25 (SMTP) from external source, potentially indicating email-based data exfiltration",
+    "affectedResources": [
+      "eni-1235b8ca123456789"
+    ],
+    "detectedAt": "2023-12-13T10:30:00Z",
+    "severity": "medium",
+    "metadata": {
+      "port": 25,
+      "protocol": "tcp",
+      "sourceIp": "192.0.2.146",
+      "dataVolume": 52000,
+      "normalPortUsage": ["80", "443", "22"]
+    }
+  },
+  {
+    "id": "anomaly-003",
+    "type": "abnormal_transfer",
+    "confidence": 0.85,
+    "explanation": "Large data transfer volume detected from S3 bucket, significantly exceeding normal usage patterns",
+    "affectedResources": [
+      "my-secure-bucket/sensitive-data/"
+    ],
+    "detectedAt": "2023-12-13T11:45:00Z",
+    "severity": "high",
+    "metadata": {
+      "transferVolume": 1024000,
+      "normalBaseline": 50000,
+      "bucketName": "my-secure-bucket",
+      "objectKey": "sensitive-data/financial-records.csv",
+      "userId": "janedoe"
+    }
+  },
+  {
+    "id": "anomaly-004",
+    "type": "rare_api_call",
+    "confidence": 0.71,
+    "explanation": "Administrative user creation API call from root account, which is rarely used in normal operations",
+    "affectedResources": [
+      "iam:CreateUser"
+    ],
+    "detectedAt": "2023-12-13T14:20:00Z",
+    "severity": "medium",
+    "metadata": {
+      "apiCall": "CreateUser",
+      "userType": "Root",
+      "createdUser": "suspicious-user",
+      "sourceIp": "192.0.2.146",
+      "frequency": "once per month average"
+    }
+  },
+  {
+    "id": "anomaly-005",
+    "type": "authentication_pattern",
+    "confidence": 0.89,
+    "explanation": "Multiple failed authentication attempts followed by successful login from same IP, indicating potential brute force attack",
+    "affectedResources": [
+      "/api/v1/auth/login"
+    ],
+    "detectedAt": "2023-12-13T10:31:22.456Z",
+    "severity": "high",
+    "metadata": {
+      "failedAttempts": 5,
+      "timeWindow": "5 minutes",
+      "sourceIp": "198.51.100.2",
+      "successfulLogin": true,
+      "userId": "user-67890"
+    }
+  }
+]

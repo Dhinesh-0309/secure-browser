@@ -1,0 +1,121 @@
+[
+  {
+    "id": "rule-proposal-001",
+    "name": "Detect High-Frequency Admin API Access",
+    "description": "Alert when administrative API endpoints receive more than 20 requests per minute from a single IP address",
+    "severity": "high",
+    "source": "ml_derived",
+    "confidence": 0.92,
+    "basedOnAnomaly": "anomaly-001",
+    "condition": {
+      "type": "rate_limit",
+      "endpoint_pattern": "/api/v1/admin/*",
+      "threshold": 20,
+      "timeWindow": "1 minute",
+      "groupBy": "sourceIp"
+    },
+    "remediation": "Implement rate limiting on administrative endpoints and consider IP-based access controls for sensitive operations",
+    "proposedAt": "2023-12-13T10:36:00Z",
+    "status": "pending_review",
+    "metadata": {
+      "trainingData": "15 days of API logs",
+      "falsePositiveRate": 0.05,
+      "detectionAccuracy": 0.94
+    }
+  },
+  {
+    "id": "rule-proposal-002",
+    "name": "Monitor Unusual SMTP Traffic",
+    "description": "Flag outbound SMTP traffic (port 25) from application servers that don't normally send email",
+    "severity": "medium",
+    "source": "ml_derived",
+    "confidence": 0.78,
+    "basedOnAnomaly": "anomaly-002",
+    "condition": {
+      "type": "network_traffic",
+      "port": 25,
+      "direction": "outbound",
+      "source_type": "application_server",
+      "baseline_check": true
+    },
+    "remediation": "Review server configuration and consider blocking outbound SMTP traffic from application servers unless explicitly required",
+    "proposedAt": "2023-12-13T10:31:00Z",
+    "status": "pending_review",
+    "metadata": {
+      "trainingData": "30 days of VPC flow logs",
+      "normalPortUsage": ["80", "443", "22", "3306"],
+      "rarePortThreshold": 0.01
+    }
+  },
+  {
+    "id": "rule-proposal-003",
+    "name": "Large S3 Data Transfer Alert",
+    "description": "Alert when S3 data transfers exceed 500MB in a single session for sensitive buckets",
+    "severity": "high",
+    "source": "ml_derived",
+    "confidence": 0.85,
+    "basedOnAnomaly": "anomaly-003",
+    "condition": {
+      "type": "data_transfer",
+      "service": "s3",
+      "threshold": 524288000,
+      "bucket_tags": ["sensitive", "confidential"],
+      "timeWindow": "single_session"
+    },
+    "remediation": "Implement data loss prevention controls and require additional authentication for large data transfers from sensitive buckets",
+    "proposedAt": "2023-12-13T11:46:00Z",
+    "status": "pending_review",
+    "metadata": {
+      "trainingData": "CloudTrail logs from 20 days",
+      "normalTransferSize": 50000,
+      "percentile95": 200000
+    }
+  },
+  {
+    "id": "rule-proposal-004",
+    "name": "Root Account Administrative Actions",
+    "description": "Alert on any administrative actions performed by root account outside of emergency procedures",
+    "severity": "critical",
+    "source": "ml_derived",
+    "confidence": 0.71,
+    "basedOnAnomaly": "anomaly-004",
+    "condition": {
+      "type": "iam_action",
+      "userType": "Root",
+      "actions": ["CreateUser", "DeleteUser", "AttachUserPolicy", "CreateRole"],
+      "emergency_window": false
+    },
+    "remediation": "Establish proper IAM delegation and restrict root account usage to emergency break-glass procedures only",
+    "proposedAt": "2023-12-13T14:21:00Z",
+    "status": "pending_review",
+    "metadata": {
+      "trainingData": "CloudTrail logs from 60 days",
+      "rootAccountUsageFrequency": "monthly",
+      "recommendedAlternative": "delegated_admin_roles"
+    }
+  },
+  {
+    "id": "rule-proposal-005",
+    "name": "Brute Force Authentication Detection",
+    "description": "Detect and alert on potential brute force attacks based on failed login patterns followed by success",
+    "severity": "high",
+    "source": "ml_derived",
+    "confidence": 0.89,
+    "basedOnAnomaly": "anomaly-005",
+    "condition": {
+      "type": "authentication_pattern",
+      "failed_attempts_threshold": 3,
+      "timeWindow": "5 minutes",
+      "success_after_failures": true,
+      "same_source_ip": true
+    },
+    "remediation": "Implement account lockout policies, CAPTCHA verification, and consider IP-based rate limiting for authentication endpoints",
+    "proposedAt": "2023-12-13T10:32:00Z",
+    "status": "pending_review",
+    "metadata": {
+      "trainingData": "Application logs from 14 days",
+      "normalFailureRate": 0.02,
+      "bruteForceIndicators": ["rapid_attempts", "success_after_failures", "automated_user_agent"]
+    }
+  }
+]

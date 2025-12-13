@@ -1,0 +1,144 @@
+[
+  {
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDACKCEVSQ6C2EXAMPLE",
+      "arn": "arn:aws:iam::123456789012:user/johndoe",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+      "userName": "johndoe"
+    },
+    "eventTime": "2023-12-13T10:30:00Z",
+    "eventSource": "ec2.amazonaws.com",
+    "eventName": "RunInstances",
+    "awsRegion": "us-west-2",
+    "sourceIPAddress": "203.0.113.12",
+    "userAgent": "aws-cli/2.13.25 Python/3.11.5 Linux/5.4.0-1043-aws exe/x86_64.ubuntu.20",
+    "requestParameters": {
+      "instancesSet": {
+        "items": [
+          {
+            "imageId": "ami-0c02fb55956c7d316",
+            "minCount": 1,
+            "maxCount": 1,
+            "instanceType": "t3.micro"
+          }
+        ]
+      },
+      "securityGroupSet": {
+        "items": [
+          {
+            "groupId": "sg-12345678"
+          }
+        ]
+      }
+    },
+    "responseElements": {
+      "instancesSet": {
+        "items": [
+          {
+            "instanceId": "i-1234567890abcdef0",
+            "imageId": "ami-0c02fb55956c7d316",
+            "state": {
+              "code": 0,
+              "name": "pending"
+            },
+            "privateDnsName": "",
+            "publicDnsName": "",
+            "reason": "",
+            "keyName": "my-key-pair",
+            "instanceType": "t3.micro",
+            "launchTime": "2023-12-13T10:30:00.000Z"
+          }
+        ]
+      }
+    },
+    "requestID": "59dbff89-35bd-4eac-99ed-be587EXAMPLE",
+    "eventID": "87654321-4321-4321-4321-210987654321",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789012",
+    "serviceEventDetails": {
+      "responseElements": null
+    }
+  },
+  {
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDACKCEVSQ6C2EXAMPLE",
+      "arn": "arn:aws:iam::123456789012:user/janedoe",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIAI44QH8DHBEXAMPLE",
+      "userName": "janedoe"
+    },
+    "eventTime": "2023-12-13T11:45:00Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "GetObject",
+    "awsRegion": "us-west-2",
+    "sourceIPAddress": "198.51.100.2",
+    "userAgent": "aws-cli/2.13.25 Python/3.11.5 Linux/5.4.0-1043-aws exe/x86_64.ubuntu.20",
+    "requestParameters": {
+      "bucketName": "my-secure-bucket",
+      "key": "sensitive-data/financial-records.csv",
+      "Host": "my-secure-bucket.s3.us-west-2.amazonaws.com",
+      "x-amz-expected-bucket-owner": "123456789012"
+    },
+    "responseElements": null,
+    "additionalEventData": {
+      "SignatureVersion": "SigV4",
+      "CipherSuite": "ECDHE-RSA-AES128-GCM-SHA256",
+      "bytesTransferredIn": 0,
+      "bytesTransferredOut": 1024000,
+      "AuthenticationMethod": "AuthHeader",
+      "x-amz-id-2": "vlR7PpkGyaF4XTjcvQjWa8Iw/hzqk7ZiIIEXAMPLEuwqn5eTdqlfamsub6k7HQBKws+YBHqiCw==",
+      "x-amz-request-id": "87654321EXAMPLE"
+    },
+    "requestID": "87654321EXAMPLE",
+    "eventID": "12345678-1234-1234-1234-123456789012",
+    "readOnly": true,
+    "eventType": "AwsApiCall",
+    "managementEvent": false,
+    "recipientAccountId": "123456789012",
+    "serviceEventDetails": {
+      "responseElements": null
+    }
+  },
+  {
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "Root",
+      "principalId": "123456789012",
+      "arn": "arn:aws:iam::123456789012:root",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIAIOSFODNN7EXAMPLE"
+    },
+    "eventTime": "2023-12-13T14:20:00Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "CreateUser",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "192.0.2.146",
+    "userAgent": "console.aws.amazon.com",
+    "requestParameters": {
+      "userName": "suspicious-user",
+      "path": "/"
+    },
+    "responseElements": {
+      "user": {
+        "path": "/",
+        "userName": "suspicious-user",
+        "userId": "AIDACKCEVSQ6C2SUSPICIOUS",
+        "arn": "arn:aws:iam::123456789012:user/suspicious-user",
+        "createDate": "2023-12-13T14:20:00Z"
+      }
+    },
+    "requestID": "suspicious-request-id",
+    "eventID": "suspicious-event-id-12345",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789012"
+  }
+]
