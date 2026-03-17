@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProctorAI — Secure Online Exams</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+</head>
+<body>
+
+<div id="violation-banner"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     SCREEN: HOME
+══════════════════════════════════════════════════════ -->
+<div id="screen-home" class="active">
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">ProctorAI</div>
+        <div class="logo-sub">Secure Online Exams</div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="show('screen-home')">
+          Home
+        </button>
+        <button class="nav-item" onclick="show('screen-admin')">
+          Admin
+        </button>
+        <button class="nav-item" onclick="show('screen-code')">
+          Take Exam
+        </button>
+      </nav>
+      <div class="sidebar-footer">AI-Powered · Browser-Based</div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      <div class="home-hero">
+        <div class="eyebrow">AI-Powered Proctoring</div>
+        <h1>Exams that monitor <em>themselves</em></h1>
+        <p>Create an exam in minutes, share a link, and let AI watch every session — detecting phones, extra persons, tab switches and more in real time.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="show('screen-admin')">Admin Dashboard</button>
+          <button class="btn-outline" onclick="show('screen-code')">Take an Exam</button>
+        </div>
+      </div>
+
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="feat-icon">Camera</div>
+          <h3>Live Face Detection</h3>
+          <p>Continuously monitors the webcam. Flags when no face is detected or the student looks away.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">Device</div>
+          <h3>Device Detection</h3>
+          <p>AI detects mobile phones, laptops, remotes and other electronic gadgets in the camera frame.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">People</div>
+          <h3>Multiple Person Alert</h3>
+          <p>Detects when more than one person is visible and logs it as a violation instantly.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">Browser</div>
+          <h3>Browser Monitoring</h3>
+          <p>Tracks tab switches, window focus loss, and fullscreen exits throughout the session.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">Score</div>
+          <h3>Integrity Score</h3>
+          <p>Every violation is weighted into a cheat score. Admins see full details, students see a summary.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">Export</div>
+          <h3>Export Results</h3>
+          <p>Download all results as a CSV with scores, integrity ratings, and full violation logs.</p>
+        </div>
+      </div>
+
+      <div style="padding: 0 40px 60px">
+        <div class="card">
+          <p style="color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:20px">How it works</p>
+          <div class="how-steps">
+            <div>
+              <div class="how-step-num">1</div>
+              <p class="how-step-text">Admin creates exam with questions &amp; duration</p>
+            </div>
+            <div>
+              <div class="how-step-num">2</div>
+              <p class="how-step-text">Unique code &amp; shareable link is generated</p>
+            </div>
+            <div>
+              <div class="how-step-num">3</div>
+              <p class="how-step-text">Student opens link, grants camera &amp; starts</p>
+            </div>
+            <div>
+              <div class="how-step-num">4</div>
+              <p class="how-step-text">AI monitors &amp; logs all violations live</p>
+            </div>
+            <div>
+              <div class="how-step-num">5</div>
+              <p class="how-step-text">Admin reviews results &amp; exports CSV</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SCREEN: ADMIN
+══════════════════════════════════════════════════════ -->
+<div id="screen-admin">
+  <div class="app-layout">
+
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">ProctorAI</div>
+        <div class="logo-sub">Secure Online Exams</div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item" onclick="show('screen-home')">
+          Home
+        </button>
+        <button class="nav-item active" onclick="show('screen-admin')">
+          Admin
+        </button>
+        <button class="nav-item" onclick="show('screen-code')">
+          Take Exam
+        </button>
+      </nav>
+      <div class="sidebar-footer">AI-Powered · Browser-Based</div>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Admin Dashboard</h1>
+        <p>Create exams, share links, and review results.</p>
+      </div>
+      <div class="page-body">
+
+        <div class="atabs">
+          <button class="atab active" id="atab-create"  onclick="aTab('create')">Create Exam</button>
+          <button class="atab"        id="atab-results" onclick="aTab('results')">Results</button>
+        </div>
+
+        <!-- Create Exam panel -->
+        <div class="apanel active" id="apanel-create">
+          <div class="card">
+            <label>Exam Title
+              <input type="text" id="a-title" placeholder="e.g. Web Technologies Quiz" />
+            </label>
+            <label style="margin-top:14px">Duration (minutes)
+              <input type="text" id="a-duration" placeholder="30" style="max-width:120px" />
+            </label>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px;margin-bottom:12px">
+              <span style="color:var(--muted);font-size:.85rem;font-weight:500">Questions</span>
+              <button class="btn-outline" onclick="addQ()" style="padding:7px 16px;font-size:.8rem">+ Add Question</button>
+            </div>
+            <div id="q-builder"></div>
+            <button class="btn-primary" onclick="createExam()" style="width:100%;margin-top:16px;padding:13px;font-size:.9rem">
+              Create Exam &amp; Get Code
+            </button>
+          </div>
+
+          <div id="a-created" style="display:none" class="card">
+            <p style="color:var(--success);font-weight:600;margin-bottom:16px;font-size:.9rem">✓ Exam created successfully</p>
+            <p style="color:var(--muted);font-size:.75rem;margin-bottom:4px">Exam Code</p>
+            <p id="a-code" style="font-size:2rem;font-weight:700;color:var(--accent);letter-spacing:5px;margin-bottom:18px"></p>
+            <p style="color:var(--muted);font-size:.75rem;margin-bottom:4px">Shareable Link</p>
+            <div class="link-row">
+              <input type="text" id="a-link" readonly />
+              <button class="btn-primary" onclick="copyLink()" style="padding:9px 16px;white-space:nowrap;font-size:.82rem">Copy</button>
+            </div>
+            <button class="btn-ghost" onclick="aTab('results')" style="margin-top:14px">View Results →</button>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <span style="color:var(--muted);font-size:.82rem;font-weight:500">Your Exams</span>
+              <button class="btn-ghost" onclick="loadAdminExamList()" style="font-size:.78rem">Refresh</button>
+            </div>
+            <div id="admin-exam-list"><p style="color:var(--muted);font-size:.85rem">Loading...</p></div>
+          </div>
+        </div>
+
+        <!-- Results panel -->
+        <div class="apanel" id="apanel-results">
+          <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:flex-end">
+            <div style="flex:1;min-width:200px">
+              <label>Filter by Exam
+                <select id="r-filter" onchange="loadResults()"></select>
+              </label>
+            </div>
+            <button class="btn-outline" onclick="exportCSV()" style="padding:9px 16px;font-size:.82rem">⬇ Export CSV</button>
+            <button class="btn-primary" onclick="loadResults()" style="padding:9px 16px;font-size:.82rem">Refresh</button>
+          </div>
+          <div id="r-summary" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap"></div>
+          <div class="card" style="padding:0;overflow:hidden">
+            <div id="r-table" style="padding:20px"><p style="color:var(--muted)">Loading...</p></div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SCREEN: STUDENT — ENTER CODE
+══════════════════════════════════════════════════════ -->
+<div id="screen-code">
+  <div class="screen-centered">
+    <div style="width:100%;max-width:400px">
+      <div style="text-align:center;margin-bottom:28px">
+        <div class="logo-mark" style="font-size:1.1rem;font-weight:700;color:var(--accent)">ProctorAI</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <h2 style="color:var(--text);margin-bottom:6px;font-size:1.15rem;font-weight:700">Enter Exam Code</h2>
+        <p style="color:var(--muted);font-size:.85rem;margin-bottom:22px;font-family:'Lora',serif">
+          Type the code your instructor gave you
+        </p>
+        <input type="text" id="s-code" placeholder="EXAM-XXXX"
+          style="text-transform:uppercase;letter-spacing:4px;font-size:1.1rem;text-align:center;padding:13px" />
+        <div id="s-code-err" style="color:var(--danger);font-size:.82rem;margin-top:8px;display:none"></div>
+        <button class="btn-primary" onclick="verifyCode()"
+          style="width:100%;margin-top:14px;padding:13px;font-size:.9rem">Continue →</button>
+        <button class="btn-ghost" onclick="show('screen-home')" style="margin-top:8px;width:100%">← Back to Home</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SCREEN: STUDENT — CONSENT
+══════════════════════════════════════════════════════ -->
+<div id="screen-consent">
+  <div class="screen-centered">
+    <div style="width:100%;max-width:500px">
+      <div class="card">
+        <h2 style="color:var(--text);margin-bottom:4px;font-size:1.1rem;font-weight:700" id="s-exam-title">Exam</h2>
+        <p style="color:var(--muted);margin-bottom:22px;font-size:.85rem;font-family:'Lora',serif" id="s-exam-meta"></p>
+
+        <label style="margin-bottom:10px">Your Full Name
+          <input type="text" id="s-name" placeholder="Enter your full name" />
+        </label>
+
+        <div style="background:var(--warn-bg);border:0.5px solid rgba(146,64,14,0.2);border-radius:var(--radius-lg);padding:18px;margin-top:14px">
+          <p style="color:var(--warn);font-weight:600;margin-bottom:12px;font-size:.85rem">⚠ Monitoring Notice</p>
+          <ul class="consent-list">
+            <li>Your webcam will be active for the entire exam</li>
+            <li>Tab switches and window focus loss are recorded</li>
+            <li>AI detects faces, extra persons and electronic devices</li>
+            <li>All activity is logged and reviewed by the admin only</li>
+          </ul>
+          <label style="display:flex;align-items:center;gap:10px;margin-top:16px;color:var(--text);cursor:pointer;font-size:.875rem;margin-bottom:0">
+            <input type="checkbox" id="s-consent" style="width:15px;height:15px;accent-color:var(--accent);flex-shrink:0" />
+            I understand and agree to be monitored
+          </label>
+        </div>
+
+        <button class="btn-primary" onclick="startExam()"
+          style="width:100%;margin-top:18px;padding:13px;font-size:.9rem">Start Exam</button>
+        <button class="btn-ghost" onclick="show('screen-code')" style="margin-top:8px;width:100%">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SCREEN: EXAM
+══════════════════════════════════════════════════════ -->
+<div id="screen-exam">
+  <header>
+    <h1 id="e-title">Exam</h1>
+    <div style="display:flex;align-items:center;gap:14px">
+      <span id="e-timer">--:--</span>
+      <button class="btn-danger" onclick="confirmSubmit()" style="padding:8px 18px;font-size:.85rem">Submit</button>
+    </div>
+  </header>
+
+  <div id="exam-progress-wrap">
+    <div id="exam-progress-bar-bg"><div id="exam-progress-bar"></div></div>
+    <span id="exam-progress-text">0 / 0 answered</span>
+  </div>
+
+  <div id="q-nav"></div>
+
+  <div class="container" style="padding-top:20px;padding-bottom:130px">
+    <div id="e-questions"></div>
+  </div>
+
+  <div id="camera-box">
+    <div style="position:relative;width:168px;height:126px">
+      <video id="proctor-video" autoplay muted playsinline
+        style="width:168px;height:126px;object-fit:cover;display:block"></video>
+      <canvas id="proctor-canvas"
+        style="position:absolute;top:0;left:0;width:168px;height:126px"></canvas>
+    </div>
+    <div id="cam-status" class="warn">● Initializing...</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SCREEN: RESULT
+══════════════════════════════════════════════════════ -->
+<div id="screen-result">
+  <div class="screen-centered">
+    <div style="width:100%;max-width:440px">
+      <div class="card" style="text-align:center">
+        <div style="font-size:2.4rem;margin-bottom:14px;color:var(--success);font-weight:300">✓</div>
+        <h2 style="color:var(--text);margin-bottom:8px;font-size:1.2rem;font-weight:700">Exam Submitted</h2>
+        <p style="color:var(--muted);margin-bottom:28px;font-size:.875rem;font-family:'Lora',serif">Your responses have been recorded successfully.</p>
+
+        <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:20px;text-align:left;margin-bottom:12px">
+          <p style="color:var(--muted);font-size:.72rem;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Your Score</p>
+          <div id="r-score" style="font-size:1.8rem;font-weight:700;color:var(--accent)"></div>
+        </div>
+
+        <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:20px;text-align:left">
+          <p style="color:var(--muted);font-size:.72rem;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Integrity Status</p>
+          <div id="r-integrity" style="font-size:.9rem;font-weight:600"></div>
+          <p style="color:var(--muted);font-size:.75rem;margin-top:10px;line-height:1.5;font-family:'Lora',serif">
+            Detailed monitoring data is reviewed privately by your administrator.
+          </p>
+        </div>
+
+        <button class="btn-primary" onclick="show('screen-home')"
+          style="margin-top:22px;padding:11px 28px">Back to Home</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Submit confirm modal -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal" style="text-align:center;max-width:400px">
+    <h3 id="submit-modal-title" style="color:var(--text);margin-bottom:8px;font-size:1rem;font-weight:700"></h3>
+    <p id="submit-modal-msg" style="color:var(--muted);font-size:.875rem;margin-bottom:16px;line-height:1.6;font-family:'Lora',serif"></p>
+    <div id="submit-unanswered" class="unanswered-list"></div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:20px">
+      <button class="btn-outline" onclick="document.getElementById('submit-modal').classList.remove('open')"
+        style="padding:9px 22px">Go Back</button>
+      <button class="btn-danger" id="submit-confirm-btn" onclick="doSubmit()" style="padding:9px 22px">
+        Submit Anyway
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Violation detail modal (admin only) -->
+<div class="modal-overlay" id="v-modal">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <h3 id="v-modal-title" style="color:var(--accent);font-size:.95rem;font-weight:700"></h3>
+      <button onclick="document.getElementById('v-modal').classList.remove('open')"
+        class="btn-ghost" style="padding:6px 12px;font-size:.8rem">Close</button>
+    </div>
+    <div id="v-modal-body"></div>
+  </div>
+</div>
+
+<script src="violations.js"></script>
+<script src="proctor.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

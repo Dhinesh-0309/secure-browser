@@ -1,0 +1,195 @@
+{
+  "exams": [
+    {
+      "id": "64775edb-a6be-4ff2-820f-397e56382162",
+      "code": "EXAM-1RSP",
+      "title": "sample",
+      "duration": 5,
+      "questions": [
+        {
+          "text": "sample",
+          "options": [
+            "sample",
+            "sample",
+            "sample",
+            "sample"
+          ],
+          "answer": 2
+        }
+      ],
+      "createdAt": "2026-03-17T12:01:39.617Z"
+    },
+    {
+      "id": "8cd805b4-75a1-4927-822a-ca0afa656bdc",
+      "code": "EXAM-C976",
+      "title": "christo",
+      "duration": 10,
+      "questions": [
+        {
+          "text": "christo",
+          "options": [
+            "christo",
+            "christo",
+            "christo",
+            "christo"
+          ],
+          "answer": 2
+        }
+      ],
+      "createdAt": "2026-03-17T13:54:22.285Z"
+    },
+    {
+      "id": "e04db09f-9642-40bc-894c-e28e4c26ef86",
+      "code": "EXAM-VFU9",
+      "title": "yffbjkbjj",
+      "duration": 23,
+      "questions": [
+        {
+          "text": "jhhjvvhjvv",
+          "options": [
+            "hkjbvbkh",
+            "hghkh",
+            "hghvhg",
+            "gyygh"
+          ],
+          "answer": 3
+        }
+      ],
+      "createdAt": "2026-03-17T13:57:10.570Z"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "f680a336-ddaf-4c3e-90ec-33753b9ce62a",
+      "studentName": "Dhinesh",
+      "examCode": "EXAM-1RSP",
+      "examTitle": "sample",
+      "startTime": "2026-03-17T12:01:57.358Z",
+      "endTime": "2026-03-17T12:02:11.583Z",
+      "submitted": true,
+      "answers": {
+        "q1": 1
+      },
+      "score": "0/1",
+      "cheatScore": 8
+    },
+    {
+      "id": "d00a7b98-617a-4ee2-8d98-1884302d0ada",
+      "studentName": "chrisma",
+      "examCode": "EXAM-C976",
+      "examTitle": "christo",
+      "startTime": "2026-03-17T13:54:42.951Z",
+      "endTime": "2026-03-17T13:55:21.913Z",
+      "submitted": true,
+      "answers": {
+        "q1": 2
+      },
+      "score": "1/1",
+      "cheatScore": 49
+    },
+    {
+      "id": "5ec7738f-f674-42d8-963d-f8e6ae794d9b",
+      "studentName": "Dhinesh",
+      "examCode": "EXAM-VFU9",
+      "examTitle": "yffbjkbjj",
+      "startTime": "2026-03-17T13:57:32.722Z",
+      "endTime": "2026-03-17T13:58:01.065Z",
+      "submitted": true,
+      "answers": {
+        "q1": 1
+      },
+      "score": "0/1",
+      "cheatScore": 23
+    }
+  ],
+  "violations": [
+    {
+      "id": "6042302d-1b4b-4f21-a053-e2eb4d1f77d8",
+      "sessionId": "f680a336-ddaf-4c3e-90ec-33753b9ce62a",
+      "type": "MOBILE_DETECTED",
+      "detail": "cell phone detected (95% confidence)",
+      "score": 8,
+      "timestamp": "2026-03-17T12:02:04.523Z"
+    },
+    {
+      "id": "ec0db9e7-1f91-4400-b8b7-a454b222d97e",
+      "sessionId": "d00a7b98-617a-4ee2-8d98-1884302d0ada",
+      "type": "MOBILE_DETECTED",
+      "detail": "cell phone detected (100% confidence)",
+      "score": 8,
+      "timestamp": "2026-03-17T13:54:53.390Z"
+    },
+    {
+      "id": "2bbfd666-d98b-4e32-9287-be757aac7196",
+      "sessionId": "d00a7b98-617a-4ee2-8d98-1884302d0ada",
+      "type": "EXTRA_PERSON",
+      "detail": "2 persons detected in frame",
+      "score": 10,
+      "timestamp": "2026-03-17T13:55:05.376Z"
+    },
+    {
+      "id": "4e052aec-785b-499b-b1f8-74b8b2d936b9",
+      "sessionId": "d00a7b98-617a-4ee2-8d98-1884302d0ada",
+      "type": "MOBILE_DETECTED",
+      "detail": "cell phone detected (87% confidence)",
+      "score": 8,
+      "timestamp": "2026-03-17T13:55:08.381Z"
+    },
+    {
+      "id": "316ee5be-143d-4d20-878b-a6a9516b878f",
+      "sessionId": "d00a7b98-617a-4ee2-8d98-1884302d0ada",
+      "type": "MOBILE_DETECTED",
+      "detail": "remote detected (72% confidence)",
+      "score": 8,
+      "timestamp": "2026-03-17T13:55:15.877Z"
+    },
+    {
+      "id": "1c7d30ba-2132-42c0-83a3-8902f4f876a6",
+      "sessionId": "d00a7b98-617a-4ee2-8d98-1884302d0ada",
+      "type": "EXTRA_PERSON",
+      "detail": "2 persons detected in frame",
+      "score": 10,
+      "timestamp": "2026-03-17T13:55:20.459Z"
+    },
+    {
+      "id": "dea6e73a-c2e7-4cba-9a07-3e608a5c8166",
+      "sessionId": "d00a7b98-617a-4ee2-8d98-1884302d0ada",
+      "type": "NO_FACE",
+      "detail": "No face detected in frame",
+      "score": 5,
+      "timestamp": "2026-03-17T13:55:21.918Z"
+    },
+    {
+      "id": "716c823a-80e7-4506-a75c-02acf0329607",
+      "sessionId": "5ec7738f-f674-42d8-963d-f8e6ae794d9b",
+      "type": "MOBILE_DETECTED",
+      "detail": "remote detected (77% confidence)",
+      "score": 8,
+      "timestamp": "2026-03-17T13:57:35.508Z"
+    },
+    {
+      "id": "22fe4ce0-b42b-400f-b73d-3c095ae490d0",
+      "sessionId": "5ec7738f-f674-42d8-963d-f8e6ae794d9b",
+      "type": "NO_FACE",
+      "detail": "No face detected in frame",
+      "score": 5,
+      "timestamp": "2026-03-17T13:57:36.782Z"
+    },
+    {
+      "id": "b37b8713-3ed2-43fb-a3ad-45e5c28aee02",
+      "sessionId": "5ec7738f-f674-42d8-963d-f8e6ae794d9b",
+      "type": "WINDOW_BLUR",
+      "detail": "Window lost focus",
+      "score": 2,
+      "timestamp": "2026-03-17T13:57:45.331Z"
+    },
+    {
+      "id": "a93b0217-98e9-42f7-b31a-1834d35e88ab",
+      "sessionId": "5ec7738f-f674-42d8-963d-f8e6ae794d9b",
+      "type": "MOBILE_DETECTED",
+      "detail": "laptop detected (72% confidence)",
+      "score": 8,
+      "timestamp": "2026-03-17T13:57:50.305Z"
+    }
+  ]
+}

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Proctor Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .tabs{display:flex;gap:4px;margin-bottom:24px}
+    .tab{padding:9px 20px;border-radius:8px;cursor:pointer;background:#1e293b;color:#64748b;border:1px solid #334155;font-size:.9rem}
+    .tab.active{background:#38bdf8;color:#0f172a;font-weight:700;border-color:#38bdf8}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+    .opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+    .opts-grid input{margin-top:0}
+    .correct-row{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+    .correct-row label{color:#94a3b8;font-size:.82rem;display:flex;align-items:center;gap:4px;cursor:pointer}
+    .link-box{display:flex;gap:8px;align-items:center;margin-top:8px}
+    .link-box input{flex:1;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#38bdf8;padding:8px 12px;font-size:.82rem}
+    .exam-card{border:1px solid #334155;border-radius:10px;padding:16px;margin-bottom:12px;background:#1e293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    .exam-card h3{color:#e2e8f0;margin-bottom:4px}
+    .exam-card p{color:#64748b;font-size:.85rem}
+    .modal-overlay{display:none;position:fixed;inset:0;background:#000a;z-index:300;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:28px;max-width:600px;width:90%;max-height:85vh;overflow-y:auto}
+    .modal h3{color:#38bdf8;margin-bottom:16px}
+    textarea{width:100%;background:#0f172a;border:1px solid #475569;border-radius:8px;color:#e2e8f0;padding:8px 12px;font-size:.9rem;resize:vertical;min-height:60px}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🛡️ Admin Dashboard</h1>
+</header>
+
+<div class="container" style="padding-top:28px">
+  <div class="tabs">
+    <div class="tab active" id="tab-exams"   onclick="switchTab('exams')">📋 My Exams</div>
+    <div class="tab"        id="tab-create"  onclick="switchTab('create')">➕ Create Exam</div>
+    <div class="tab"        id="tab-results" onclick="switchTab('results')">📊 Results</div>
+  </div>
+
+  <!-- MY EXAMS -->
+  <div class="tab-panel active" id="panel-exams">
+    <div id="exams-list"><p style="color:#64748b">Loading...</p></div>
+  </div>
+
+  <!-- CREATE EXAM -->
+  <div class="tab-panel" id="panel-create">
+    <div class="card">
+      <h3 style="color:#e2e8f0;margin-bottom:20px">Create New Exam</h3>
+      <label>Exam Title
+        <input type="text" id="new-title" placeholder="e.g. Web Technologies Quiz" />
+      </label>
+      <label style="margin-top:14px">Duration (minutes)
+        <input type="text" id="new-duration" placeholder="30" style="max-width:120px" />
+      </label>
+      <div style="margin-top:20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#94a3b8;font-size:.9rem">Questions</span>
+        <button class="btn-primary" onclick="addQuestion()" style="padding:6px 14px;font-size:.85rem">+ Add Question</button>
+      </div>
+      <div id="questions-builder"></div>
+      <button class="btn-success" onclick="createExam()" style="width:100%;margin-top:20px;padding:13px">
+        Create Exam &amp; Generate Code
+      </button>
+    </div>
+    <div id="created-result" style="display:none" class="card">
+      <p style="color:#22c55e;font-weight:600;margin-bottom:12px">Exam created successfully!</p>
+      <p style="color:#64748b;font-size:.8rem">Exam Code</p>
+      <p id="created-code" style="font-size:1.8rem;font-weight:700;color:#38bdf8;letter-spacing:4px;margin-bottom:12px"></p>
+      <p style="color:#64748b;font-size:.8rem;margin-bottom:4px">Shareable Link</p>
+      <div class="link-box">
+        <input type="text" id="created-link" readonly />
+        <button class="btn-primary" onclick="copyLink()" style="padding:8px 14px">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="tab-panel" id="panel-results">
+    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:200px">
+        <label>Filter by Exam
+          <select id="filter-exam" onchange="loadResults()"
+            style="width:100%;padding:10px;background:#0f172a;border:1px solid #475569;border-radius:8px;color:#e2e8f0;margin-top:6px">
+            <option value="">All Exams</option>
+          </select>
+        </label>
+      </div>
+      <button class="btn-success" onclick="exportCSV()" style="padding:10px 18px">Export CSV</button>
+      <button class="btn-primary" onclick="loadResults()" style="padding:10px 18px">Refresh</button>
+    </div>
+    <div id="summary-cards" style="display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap"></div>
+    <div class="card">
+      <div id="results-table"><p style="color:#64748b">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- Violation modal -->
+<div class="modal-overlay" id="v-modal">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 id="v-modal-title">Violation Details</h3>
+      <button onclick="closeModal()" style="background:#334155;color:#e2e8f0;padding:6px 12px;border-radius:6px">Close</button>
+    </div>
+    <div id="v-modal-body"></div>
+  </div>
+</div>
+
+<script>
+const BASE = window.location.origin;
+let allExams = [];
+let qCount   = 0;
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'exams')   loadExams();
+  if (name === 'results') loadResults();
+}
+
+async function loadExams() {
+  const res = await fetch('/api/admin/exams');
+  allExams  = await res.json();
+  const el  = document.getElementById('exams-list');
+  if (!allExams.length) {
+    el.innerHTML = '<p style="color:#64748b">No exams yet. Use "Create Exam" to get started.</p>';
+    return;
+  }
+  el.innerHTML = allExams.map(e => `
+    <div class="exam-card">
+      <div>
+        <h3>${e.title}</h3>
+        <p>Code: <span style="color:#38bdf8;font-weight:700;letter-spacing:2px">${e.code}</span>
+           &nbsp;·&nbsp; ${e.questions.length} questions &nbsp;·&nbsp; ${e.duration} min
+           &nbsp;·&nbsp; ${new Date(e.createdAt).toLocaleDateString()}</p>
+        <div class="link-box">
+          <input type="text" value="${BASE}/?code=${e.code}" readonly />
+          <button class="btn-primary" onclick="navigator.clipboard.writeText('${BASE}/?code=${e.code}').then(()=>alert('Copied!'))"
+            style="padding:6px 12px;font-size:.8rem">Copy Link</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-primary" onclick="switchTab('results');setFilterExam('${e.code}')"
+          style="padding:8px 14px;font-size:.85rem">Results</button>
+        <button class="btn-danger" onclick="deleteExam('${e.id}')"
+          style="padding:8px 14px;font-size:.85rem">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+async function deleteExam(id) {
+  if (!confirm('Delete this exam?')) return;
+  await fetch('/api/admin/exam/' + id, { method: 'DELETE' });
+  loadExams();
+}
+
+function addQuestion() {
+  qCount++;
+  const idx = qCount;
+  const div = document.createElement('div');
+  div.id = 'qb-' + idx;
+  div.style.cssText = 'border:1px solid #334155;border-radius:10px;padding:16px;margin-bottom:12px;background:#0f172a';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="color:#94a3b8;font-size:.85rem">Question ${idx}</span>
+      <button onclick="document.getElementById('qb-${idx}').remove()"
+        style="background:#334155;color:#94a3b8;padding:4px 10px;border-radius:6px;font-size:.8rem">Remove</button>
+    </div>
+    <textarea placeholder="Question text..." id="qt-${idx}"></textarea>
+    <div class="opts-grid">
+      <input type="text" placeholder="Option A" id="qo-${idx}-0" />
+      <input type="text" placeholder="Option B" id="qo-${idx}-1" />
+      <input type="text" placeholder="Option C" id="qo-${idx}-2" />
+      <input type="text" placeholder="Option D" id="qo-${idx}-3" />
+    </div>
+    <div class="correct-row">
+      <span style="color:#64748b;font-size:.82rem">Correct:</span>
+      ${['A','B','C','D'].map((l,i) => `<label><input type="radio" name="qa-${idx}" value="${i}" /> ${l}</label>`).join('')}
+    </div>`;
+  document.getElementById('questions-builder').appendChild(div);
+}
+
+async function createExam() {
+  const title    = document.getElementById('new-title').value.trim();
+  const duration = parseInt(document.getElementById('new-duration').value) || 30;
+  if (!title) { alert('Enter an exam title.'); return; }
+
+  const questions = [];
+  for (let i = 1; i <= qCount; i++) {
+    const el = document.getElementById('qb-' + i);
+    if (!el) continue;
+    const text    = document.getElementById('qt-' + i).value.trim();
+    const options = [0,1,2,3].map(j => document.getElementById('qo-' + i + '-' + j).value.trim());
+    const ansEl   = document.querySelector('input[name="qa-' + i + '"]:checked');
+    if (!text)              { alert('Question ' + i + ': enter question text.'); return; }
+    if (options.some(o=>!o)){ alert('Question ' + i + ': fill all 4 options.'); return; }
+    if (!ansEl)             { alert('Question ' + i + ': select correct answer.'); return; }
+    questions.push({ text, options, answer: parseInt(ansEl.value) });
+  }
+  if (!questions.length) { alert('Add at least one question.'); return; }
+
+  const res  = await fetch('/api/exam', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, duration, questions })
+  });
+  const data = await res.json();
+  const exam = data.exam;
+
+  document.getElementById('created-code').textContent = exam.code;
+  document.getElementById('created-link').value = BASE + '/?code=' + exam.code;
+  document.getElementById('created-result').style.display = 'block';
+  document.getElementById('questions-builder').innerHTML = '';
+  document.getElementById('new-title').value = '';
+  document.getElementById('new-duration').value = '';
+  qCount = 0;
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(document.getElementById('created-link').value)
+    .then(() => alert('Link copied!'));
+}
+
+async function loadResults() {
+  const selEl = document.getElementById('filter-exam');
+  const cur   = selEl.value;
+  const exRes = await fetch('/api/admin/exams');
+  allExams    = await exRes.json();
+  selEl.innerHTML = '<option value="">All Exams</option>' +
+    allExams.map(e => `<option value="${e.code}" ${e.code===cur?'selected':''}>${e.title} (${e.code})</option>`).join('');
+
+  const code = selEl.value;
+  const url  = '/api/admin/sessions' + (code ? '?examCode=' + code : '');
+  const res  = await fetch(url);
+  const sessions = await res.json();
+  const submitted = sessions.filter(s => s.submitted);
+  const flagged   = submitted.filter(s => s.cheatScore > 10);
+
+  document.getElementById('summary-cards').innerHTML = [
+    { label:'Total Attempts', value: sessions.length,  color:'#38bdf8' },
+    { label:'Submitted',      value: submitted.length, color:'#22c55e' },
+    { label:'Flagged',        value: flagged.length,   color:'#ef4444' }
+  ].map(c => `
+    <div class="card" style="flex:1;min-width:130px;text-align:center;border-color:${c.color}44">
+      <div style="font-size:2rem;font-weight:700;color:${c.color}">${c.value}</div>
+      <div style="color:#64748b;font-size:.82rem">${c.label}</div>
+    </div>`).join('');
+
+  if (!submitted.length) {
+    document.getElementById('results-table').innerHTML = '<p style="color:#64748b">No submitted sessions yet.</p>';
+    return;
+  }
+
+  const badTypes = ['MOBILE_DETECTED','EXTRA_PERSON','MULTIPLE_FACES'];
+  const rows = submitted.map(s => {
+    const cs    = s.cheatScore || 0;
+    const cls   = cs===0?'score-low':cs<=10?'score-low':cs<=25?'score-medium':'score-high';
+    const label = cs===0?'Clean':cs<=10?'Low':cs<=25?'Moderate':'High';
+    const dur   = s.endTime ? Math.round((new Date(s.endTime)-new Date(s.startTime))/1000)+'s' : '-';
+    const vTypes = [...new Set((s.violations||[]).map(v=>v.type))];
+    const vTags  = vTypes.length
+      ? vTypes.map(t=>`<span style="display:inline-block;background:#334155;border-radius:4px;padding:2px 6px;margin:2px;font-size:.78rem;color:${badTypes.includes(t)?'#fca5a5':'#fcd34d'}">${t.replace(/_/g,' ')}</span>`).join('')
+      : '<span style="color:#475569;font-size:.82rem">None</span>';
+    const sd = JSON.stringify(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<tr>
+      <td>${s.studentName}</td>
+      <td style="color:#38bdf8">${s.examCode}</td>
+      <td style="font-weight:600">${s.score||'-'}</td>
+      <td>${new Date(s.startTime).toLocaleString()}</td>
+      <td>${dur}</td>
+      <td><span class="score-badge ${cls}">${label} (${cs})</span></td>
+      <td>${vTags}</td>
+      <td><button onclick='showViolations(${sd})'
+        style="background:#334155;color:#e2e8f0;padding:5px 10px;border-radius:6px;font-size:.8rem;cursor:pointer">
+        Details</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('results-table').innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Student</th><th>Exam</th><th>Score</th>
+        <th>Started</th><th>Duration</th><th>Integrity</th><th>Flags</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function setFilterExam(code) {
+  document.getElementById('filter-exam').value = code;
+  loadResults();
+}
+
+function showViolations(session) {
+  document.getElementById('v-modal-title').textContent =
+    session.studentName + ' — ' + session.examCode;
+  const colorMap = {
+    MOBILE_DETECTED:'score-high', EXTRA_PERSON:'score-high', MULTIPLE_FACES:'score-high',
+    NO_FACE:'score-medium', LOOKING_AWAY:'score-medium',
+    TAB_SWITCH:'score-low', WINDOW_BLUR:'score-low', FULLSCREEN_EXIT:'score-low'
+  };
+  const vs = session.violations || [];
+  document.getElementById('v-modal-body').innerHTML = vs.length === 0
+    ? '<p style="color:#64748b">No violations recorded.</p>'
+    : `<p style="color:#64748b;font-size:.82rem;margin-bottom:12px">
+        Cheat score: <span style="color:#ef4444;font-weight:700">${session.cheatScore}</span>
+       </p>` +
+      vs.map(v => `
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #0f172a">
+          <span class="score-badge ${colorMap[v.type]||'score-low'}" style="white-space:nowrap;font-size:.72rem">
+            ${v.type.replace(/_/g,' ')}
+          </span>
+          <div>
+            <div style="color:#e2e8f0;font-size:.88rem">${v.detail}</div>
+            <div style="color:#475569;font-size:.78rem;margin-top:2px">
+              ${new Date(v.timestamp).toLocaleString()} &nbsp;·&nbsp; +${v.score} pts
+            </div>
+          </div>
+        </div>`).join('');
+  document.getElementById('v-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('v-modal').classList.remove('open');
+}
+
+function exportCSV() {
+  const code = document.getElementById('filter-exam').value;
+  window.location.href = '/api/admin/export' + (code ? '?examCode=' + code : '');
+}
+
+loadExams();
+</script>
+</body>
+</html>
